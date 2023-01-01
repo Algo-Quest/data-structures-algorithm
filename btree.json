@@ -1,0 +1,34 @@
+{
+  "bool": false,
+  "root": {
+    "keys": [33],
+    "child": [
+      {
+        "keys": [31],
+        "child": [
+          { "keys": [30], "child": [] },
+          { "keys": [32, 35], "child": [] }
+        ]
+      },
+      {
+        "keys": [39],
+        "child": [
+          {
+            "keys": [36],
+            "child": [
+              { "keys": [34, 38], "child": [] },
+              { "keys": [37, 41], "child": [] }
+            ]
+          },
+          {
+            "keys": [42],
+            "child": [
+              { "keys": [40, 44], "child": [] },
+              { "keys": [43, 45], "child": [] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
