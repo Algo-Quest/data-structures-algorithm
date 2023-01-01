@@ -1,3 +1,5 @@
+//Btree works for two split 1. for key when key length == order & 2. when child length > order.
+
 function splitForkey(node) {
   let half = Math.floor(node.keys.length / 2),
     left = node.keys.slice(0, half),
