@@ -1,143 +1,110 @@
-//Btree works for two split 1. for key when key length == order & 2. when child length > order.
+class PriorityQueue {
+    constructor() {
+        this.values = [];
+    }
 
-function splitForkey(node) {
-  let half = Math.floor(node.keys.length / 2),
-    left = node.keys.slice(0, half),
-    mid = [node.keys[half]],
-    right = node.keys.slice(half + 1);
+    enqueue(val, priority) {
+        this.values.push({ val, priority });
+        this.sort();
+    }
 
-  return {
-    left,
-    mid,
-    right,
-  };
+    dequeue() {
+        return this.values.shift();
+    }
+
+    sort() {
+        this.values.sort((a, b) => a.priority - b.priority);
+    }
 }
 
-function splitForChild({ child } = node) {
-  let half = Math.floor(child.length / 2),
-    left = child.slice(0, half),
-    right = child.slice(half);
+class WeightedGraph {
+    constructor() {
+        this.adjacencyList = {};
+    }
+    addVertex(vertex) {
+        if (!this.adjacencyList[vertex]) this.adjacencyList[vertex] = [];
+    }
+    addEdge(vertex1, vertex2, weight) {
+        this.adjacencyList[vertex1].push({ node: vertex2, weight });
+        this.adjacencyList[vertex2].push({ node: vertex1, weight });
+    }
 
-  return { left, right };
+    Dijkstra(start, finish) {
+        const nodes = new PriorityQueue();
+        const distances = {};
+        const previous = {};
+        let path = []; // to return at end
+        let smallest;
+
+        // build up initial state
+        for (let vertex in this.adjacencyList) {
+            if (vertex === start) {
+                nodes.enqueue(vertex, 0);
+                distances[vertex] = 0;
+            } else {
+                distances[vertex] = Infinity;
+                nodes.enqueue(vertex, Infinity);
+            }
+            previous[vertex] = null;
+        }
+
+        // as long as there is something to visit
+        while (nodes.values.length) {
+            smallest = nodes.dequeue().val;
+            if (smallest === finish) {
+                // WE ARE DONE
+                // BUILD UP PATH TO RETURN AT END
+                while (previous[smallest]) {
+                    path.push(smallest);
+                    smallest = previous[smallest];
+                }
+
+                break;
+            }
+
+            for (let neighbor in this.adjacencyList[smallest]) {
+                // find neighboring node
+                let nextNode = this.adjacencyList[smallest][neighbor];
+                // console.log(nextNode);
+                // calculate new distance to neighboring node
+                let candidate = distances[smallest] + nextNode.weight;
+                let nextNeighbor = nextNode.node;
+
+                if (candidate < distances[nextNeighbor]) {
+                    // updating new smallest distance to neighbor
+                    distances[nextNeighbor] = candidate;
+                    // updating previous – How we got to neighbor
+                    previous[nextNeighbor] = smallest;
+                    // enqueue in priority queue with new priority
+                    nodes.enqueue(nextNeighbor, candidate);
+                }
+            }
+        }
+
+        let p = [...new Set(path)];
+        p.reverse().unshift(start);
+        return p;
+    }
 }
 
-class Node {
-  constructor(value) {
-    this.keys = [];
-    this.child = [];
-    this.push(value);
-  }
+var graph = new WeightedGraph();
+graph.addVertex("A");
+graph.addVertex("B");
+graph.addVertex("C");
+graph.addVertex("D");
+graph.addVertex("E");
+graph.addVertex("F");
+graph.addVertex("G");
 
-  push(value) {
-    if (value) this.keys.push(value);
-  }
-}
+graph.addEdge("A", "B", 4);
+graph.addEdge("A", "C", 2);
+graph.addEdge("B", "E", 3);
+graph.addEdge("C", "D", 2);
+graph.addEdge("C", "F", 4);
+graph.addEdge("D", "E", 0);
+graph.addEdge("D", "F", 1);
+graph.addEdge("E", "F", 10);
+graph.addEdge("C", "G", 0);
+graph.addEdge("G", "D", 0);
 
-class Btree {
-  bool = true;
-  constructor() {
-    this.root = null;
-  }
-
-  insert(value) {
-    let current = this.root;
-
-    if (!this.root) {
-      let newNode = new Node(value);
-      return (this.root = newNode);
-    }
-
-    let result = this.insertHelper(current, value);
-
-    result.keys.push(value);
-
-    if (current.keys.length >= 3 && this.bool == true) {
-      let leftNode = new Node(),
-        rightNode = new Node(),
-        result = splitForkey(current);
-      leftNode.keys = leftNode.keys.concat(result.left);
-      rightNode.keys = rightNode.keys.concat(result.right);
-      current.keys = result.mid;
-      current.child.push(leftNode, rightNode);
-      this.bool = false;
-    }
-
-    // console.log(result);
-  }
-
-  insertHelper(node, value) {
-    let i;
-
-    for (i = 0; i < node.keys.length; i++) {
-      if (value < node.keys[i]) {
-        break;
-      }
-    }
-
-    if (node.child.length == 0) return node;
-
-    let result = this.insertHelper(node.child[i], value);
-
-    if (node.child[i].keys.length >= 3) {
-      let t = splitForkey(node.child[i]);
-      //   node.child.splice(i, 1);
-      node.keys.push(...t.mid);
-      let leftNode = new Node(),
-        rightNode = new Node();
-      leftNode.keys = leftNode.keys.concat(t.left);
-      rightNode.keys = rightNode.keys.concat(t.right);
-      node.child.push(leftNode, rightNode);
-      node.child.splice(i, 1);
-      node.child[i].keys.push(value);
-    }
-
-    //
-
-    if (node.child.length > 3) {
-      let { left, right } = splitForChild(node);
-      let r = splitForkey(node);
-      node.keys = r.mid;
-
-      let leftNode = new Node(),
-        rightNode = new Node();
-
-      leftNode.keys = r.left;
-      leftNode.child.push(...left);
-      rightNode.keys = r.right;
-      rightNode.child.push(...right);
-
-      node.child = [leftNode, rightNode];
-    }
-
-    return result;
-  }
-}
-
-let btree = new Btree();
-
-btree.insert(30);
-btree.insert(31);
-btree.insert(32);
-btree.insert(33);
-btree.insert(34);
-btree.insert(35);
-btree.insert(36);
-btree.insert(37);
-btree.insert(38);
-btree.insert(39);
-btree.insert(40);
-btree.insert(41);
-btree.insert(42);
-btree.insert(43);
-btree.insert(44);
-btree.insert(45);
-// btree.insert(46);
-
-let fs = require("fs");
-
-console.log(btree.root.child[0].child);
-
-fs.writeFile("./btree.json", JSON.stringify(btree), (err) => {
-  if (err) throw err;
-  console.log("file write done");
-});
+console.log(graph.Dijkstra("A", "E"));
