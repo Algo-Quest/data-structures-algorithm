@@ -2,12 +2,12 @@ let obj = {
   fileName: "A",
   filePath: "B",
   protoText: "C",
-  ast: {
+  mobile: {
     google: {
       data: "G",
     },
     some: {
-      candi: {
+      game: {
         entitlement: {
           data: "E",
         },
