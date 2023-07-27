@@ -1,35 +1,35 @@
 let t = [
-  [[[1, 2], [[1]], [3, 4, 5, 6], [7, 8]], [[9, 10]], [0]],
-  [[11]],
-  [[12], [20]],
+  [
+    [0, 3, 4],
+    [1, 2, 3, 4, [-1]],
+  ],
+  [[0, 0, 1]],
+  [0, 1],
 ];
 
-function check(arr) {
+function one(arr) {
   arr.map((elem, index) => {
     if (Array.isArray(elem)) {
-      check(elem);
+      one(elem);
     } else {
-      handler(arr, index, t);
+      handler(index, arr, t);
     }
   });
 }
 
-check(t);
+one(t);
 
-function handler(arr, index, arr2) {
-  let first = arr.length;
-  arr2.map((elem2, index2) => {
+function handler(index, arr, t) {
+  t.map((elem2, index2) => {
     if (Array.isArray(elem2)) {
-      handler(arr, index, elem2);
+      handler(index, arr, elem2);
     } else {
-      let second = arr2.length;
-      if (first < second) {
-        let t = arr;
-        arr = arr2;
-        arr2 = t;
+      if (arr[index] < t[index2]) {
+        [arr[index], t[index2]] = [t[index2], arr[index]];
       }
     }
   });
 }
 
-console.log(JSON.stringify(t));
+console.log(t);
+
