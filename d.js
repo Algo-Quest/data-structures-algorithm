@@ -30,6 +30,6 @@ function handler(index, arr, t) {
     }
   });
 }
-
+//
 console.log(t);
 
